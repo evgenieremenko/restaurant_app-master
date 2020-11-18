@@ -1,0 +1,10 @@
+== Simple Restaurant Finder
+
+This is a practice app for Ruby on Rails using the technologies:
+
+* Ruby
+* Ruby on Rails
+* Google Maps API
+* Facebook Omniauth using Devise
+* Internalizations
+* Rspec / Unit Testing

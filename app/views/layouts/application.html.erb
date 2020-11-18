@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Fudz</title>
+  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+  <%= csrf_meta_tags %>
+  <link href="https://fonts.googleapis.com/css?family=Abel|Lobster" rel="stylesheet">
+
+</head>
+<body id = 'wrap'>
+
+  <div class="wrapper">
+<!--    <nav id="top-nav" class="navbar navbar-default" style="margin-bottom: 0px;" data-spy="affix" data-offset-top="600">-->
+    <nav id="top-nav" class="navbar navbar-default <%= "home-nav" if current_page?(home_path)%>" style="margin-bottom: 0px;">
+      <div class="container-fluid">
+        <!-- Brand and toggle get grouped for better mobile display -->
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <%= link_to "Fudz Finder", home_path, class: 'navbar-brand' %>
+        </div>
+
+          <!-- Collect the nav links, forms, and other content for toggling -->
+        <div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+          <ul class="nav navbar-nav navbar-right">
+            <li class="<%= filter_active_class(home_path) %>"><%= link_to t('.home'), home_path, class: '' %></li>
+
+            <li class="<%= filter_active_class(cuisines_path)%>"><%= link_to t('.allcuisines'), cuisines_path %></li>
+
+            <li class="<%= filter_active_class(restaurant_search_path)%>"><%= link_to t('.restaurants'), restaurant_search_path(searchQuery: "") %></li>
+            <% if current_page?(home_path) %>
+              <li class=""><a href="#cuisines"><%= t('.cuisines')%></a></li>
+              <li class=""><a href="#reviews"><%= t('.reviews')%></a></li>
+              <% if user_signed_in? %>
+                <% unless current_user.restaurants.present? %>
+                  <li class=""><a href="#make_a_resto"><%= t('.makeresto')%></a></li>
+                <% end %>
+              <% else %>
+                <li class=""><a href="#make_a_resto"><%= t('.makeresto')%></a></li>
+              <% end %>
+            <% end %>
+            <% if user_signed_in? %>
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="height: 100%;">
+                  <%= icon('user', current_user.name, style: 'margin-right: 5px;') %>
+                  <%= icon('chevron-down', style: 'margin-left: 5px;') %>
+                </a>
+                <ul id="dropdown-menu" class="dropdown-menu">
+                  <% if user_signed_in? %>
+                    <% if current_user.admin? %>
+                      <li><%= link_to t('.myadmin'), admin_root_path %></li>
+                    <% end%>
+                  <% end%>
+                  <li><%= link_to t('.myprofile'), user_profile_path(current_user.id) %></li>
+                  <% if current_user.restaurants.present? %>
+                    <li><%= link_to t('.myrestaurants'), users_restaurant_path %></li>
+                  <% end %>
+                  <li><%= link_to t('.signout'), destroy_user_session_path, method: :delete %></li>
+                </ul>
+              </li>
+            <% else %>
+              <li class=""><%= link_to icon('user', t('.login'), style: 'margin-right: 8px;'), new_user_session_path %></li>
+            <% end %>
+
+          </ul>
+        </div><!-- /.navbar-collapse -->
+      </div><!-- /.container-fluid -->
+    </nav>
+
+
+    <% if success %>
+      <div class="alert alert-success alert-dismissible floating_alert" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <%= success.html_safe %>
+      </div>
+    <% end %>
+
+    <% if failure %>
+      <div class="alert alert-danger alert-dismissible floating_alert" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <%= failure.html_safe %>
+      </div>
+    <% end %>
+
+    <% if notice %>
+      <div class="alert alert-success alert-dismissible floating_alert" role="alert">
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>
+        <%= notice.html_safe %>
+      </div>
+    <% end %>
+    <%= yield %>
+
+  </div>
+
+  <footer id="footer" style="background-color: whitesmoke; color: #676767; border-top: 2px solid #CF2228; margin-top: 0px;">
+    <div class="container" style="max-width: 800px; padding: 30px;">
+      <div class="row" style="margin-bottom: 30px;">
+        <div class="col-md-3 col-sm-3 col-xs-12">
+          <div class="footer_title">
+            Fudz Finder
+          </div>
+          <div class="footer_body">
+            <ul class="list-unstyled">
+              <li><%= link_to t('.home'), home_path %></li>
+              <% unless user_signed_in? %>
+              <li><%= link_to t('.login'), new_user_session_path %></li>
+              <% end %>
+              <li><%= link_to t('.restaurants'), restaurant_search_path(searchQuery: "") %></li>
+              <li><%= link_to t('.cuisines'), cuisines_path %></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12">
+          <div class="footer_title">
+            <%= t('.about') %>
+          </div>
+          <div class="footer_body">
+            <ul class="list-unstyled">
+              <li><%= link_to t('.about'), about_page_path %></li>
+              <li><%= link_to t('.contact'), contact_page_path %></li>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12">
+          <div class="footer_title">
+            <%= t('.getstarted')%>
+          </div>
+          <div class="footer_body">
+            <ul class="list-unstyled">
+              <li><%= link_to t('.makeresto'), new_restaurant_path %></li>
+              <% unless user_signed_in? %>
+              <li><%= link_to t('.signuptoday'), new_user_registration_path %></li>
+              <% end %>
+            </ul>
+          </div>
+        </div>
+        <div class="col-md-3 col-sm-3 col-xs-12">
+          <div class="footer_title">
+            <%= t('.language') %>
+          </div>
+          <div class="footer_body">
+            <div class="dropdown">
+              <button class="btn btn-default dropdown-toggle" type="button" id="dropdownMenu2" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                <%= t('.language') %>
+                <span class="caret"></span>
+              </button>
+              <ul class="dropdown-menu" role="menu">
+                <% locale_name_pairs.each do |locale|%>
+                  <li>
+                   <%= link_to locale[0], change_locale_path(locale[1].to_sym) %>
+                  </li>
+                <% end %>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="container" style="max-width: 600px; border-top: 1px solid #ccc; padding: 20px 0 50px 0;">
+      <div class="text-center">
+        &copy; Soolfie, Inc.
+      </div>
+    </div>
+  </footer>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-md" role="document">
+    <div id="show-modal" class="modal-content">
+      ...
+    </div>
+  </div>
+</div>
+
+
+</body>
+</html>

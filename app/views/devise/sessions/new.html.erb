@@ -1,0 +1,44 @@
+<div id="loginform" class="container" style="margin-bottom: 35px;">
+  <div class="form-header" style="background-color: #CF2228; color: #fff">
+    <div class="text-center"><%= t('.login')%></div>
+  </div>
+  <div class="form-body">
+	
+    <%= form_for(resource, as: resource_name, url: session_path(resource_name)) do |f| %>
+	
+      <% if flash[:alert] && !flash[:alert].include?(t('.signinfirst')) %>
+        <div class="alert alert-danger" role="alert">
+          <%= flash[:alert] %>
+        </div>
+      <% end %>
+
+      <div class="input-group input-group-lg" style="margin-bottom: 10px;">
+        <span class="input-group-addon">
+          <%= icon('user') %>
+        </span>
+        <%= f.text_field :username, autocomplete: :on, class: 'form-control', placeholder: t('.username'), autofocus: true, required: true %>
+      </div>
+
+      <div class="input-group input-group-lg" style="margin-bottom: 10px;">
+        <span class="input-group-addon">
+          <%= icon('lock', style: 'width: 15px;') %>
+        </span>
+        <%= f.password_field :password, autocomplete: :off, class: 'form-control', placeholder: t('.placepass'), required: true%>
+      </div>
+
+      <div class="actions">
+        <div class="row">
+          <div class="col-md-6">
+            <%= f.submit t('.login'), class: 'btn btn-danger', style: 'width: 100%; height: 46px; margin-bottom: 10px;' %>
+          </div>
+          <div class="col-md-6">
+            <%= link_to t('.signup'), new_user_registration_path, class: 'btn btn-primary outline', style: 'width: 100%; height: 46px; padding-top: 12px; margin-bottom: 10px;' %>
+          </div>
+        </div>
+        <p class="text-center">or</p>
+        <%= link_to "#{icon('facebook-official', t('.loginfacebook'), style: 'margin-right: 10px;')}".html_safe, user_facebook_omniauth_authorize_path, class: 'btn btn-facebook', style: 'width: 100%; height: 46px; padding-top: 12px;' %>
+        <%= link_to t('.forgotpass'), new_password_path(resource_name) %><br />
+      </div>
+    <% end %>
+  </div>
+</div>

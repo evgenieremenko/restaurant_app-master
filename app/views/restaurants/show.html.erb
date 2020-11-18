@@ -1,0 +1,352 @@
+<%= render 'restaurants/searchbar' %>
+
+
+<div class="container resto-container" style="box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.19); margin-bottom: 20px; padding: 0;">
+  <div class="row" style="margin: 0; padding: 0;">
+    <div id="sidebar" class="col-md-3 col-sm-4 col-xs-12" style="margin: 0; padding: 0;">
+      <% unless @restaurant.location.blank? %>
+        <iframe
+          width="600"
+          height="450"
+          frameborder="0" style="border:0;"
+          src="https://www.google.com/maps/embed/v1/place?key=AIzaSyAmeU6jS4Tk8t3OudUKIn7XtciDfe9CbZY
+               &q=<%= @restaurant.location.latitude %>,<%= @restaurant.location.longitude %>" allowfullscreen>
+        </iframe>
+      <% else %>  
+        <h5 style="padding: 100px 0 100px 80px"><%= t('.mapunavailable')%></h5>
+      <% end %>
+      <div style="padding: 10px; margin-top: -5px;">
+        <h4><%= t('.restonear')%></h4>
+        <% if @restaurant.location.present? %>
+          <% if @restaurant.location.nearbys(3).where.not(restaurant_id: nil).present? %>
+            <div class="list-group nearbys" style="">
+              <% Restaurant.where(id: @restaurant.location.nearbys(3).where.not(restaurant_id: nil).map(&:restaurant_id), status:   'Accepted').limit(5).each do |resto| %>
+
+                <%= link_to resto, class: 'list-group-item', style: 'margin: 5px 0 5px 0;' do %>
+                  <div class="row">
+                    <div class="col-md-3">
+                      <div style="background-image: url('<%= asset_path(display_resto(resto))%>'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 40px; width: 40px;"></div>
+                    </div>
+                    <div class="col-md-9">
+                      <%= resto.name %><br>
+                      <small>
+                        <% (resto.ave_ratings.to_i).times do %>
+                          <%= icon('star') %>
+                        <% end %>
+                        <% unless resto.ave_ratings % 1 == 0 %>
+                          <%= icon('star-half-o')%>
+                          <% (4 - resto.ave_ratings.to_i).times do %>
+                            <%= icon('star-o') %>
+                          <% end %>
+                        <% else %>
+                          <% (5 - resto.ave_ratings.to_i).times do %>
+                            <%= icon('star-o') %>
+                          <% end %>
+                        <% end %>
+                        &nbsp;&nbsp;(<%= pluralize(resto.ratings.count, 'review') %>)
+                      </small>
+                    </div>
+                  </div>
+                <% end %>
+              <% end %>
+            </div>
+          <% else %>
+            <%= t('.noresto')%>
+          <% end %>
+        <% else %>
+          <%= t('.noresto')%>
+        <% end %>
+        
+      </div>
+      <div style="padding: 10px; margin-top: -5px;">
+        <h4><%= t('.topresto')%></h4>
+          
+        <% if Restaurant.joins(:ratings).group("restaurants.id").order("AVG(ratings.rate) DESC").limit(5).present? %>
+          <div class="list-group nearbys" style="">
+            <% Restaurant.joins(:ratings).group("restaurants.id").order("AVG(ratings.rate) DESC").limit(5).each do |resto| %>
+
+            <%= link_to resto, class: 'list-group-item', style: 'margin: 5px 0 5px 0;' do %>
+                <div class="row" style="">
+                  <div class="col-md-3">
+                    <div style="background-image: url('<%= asset_path(display_resto(resto))%>'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 40px; width: 40px;"></div>
+                  </div>
+                  <div class="col-md-9">
+                    <%= resto.name %><br>
+                    <small>
+                      <% (resto.ave_ratings.to_i).times do %>
+                        <%= icon('star') %>
+                      <% end %>
+                      <% unless resto.ave_ratings % 1 == 0 %>
+                        <%= icon('star-half-o')%>
+                        <% (4 - resto.ave_ratings.to_i).times do %>
+                          <%= icon('star-o') %>
+                        <% end %>
+                      <% else %>
+                        <% (5 - resto.ave_ratings.to_i).times do %>
+                          <%= icon('star-o') %>
+                        <% end %>
+                      <% end %>
+                      &nbsp;&nbsp;(<%= pluralize(resto.ratings.count, 'review') %>)
+                    </small>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <%= t('.noresto')%>
+        <% end %>
+            
+          
+      </div>
+      <div style="padding: 10px; margin-top: -5px;">
+        <h4><%= t('.newrestaurants')%></h4>
+          <% if Restaurant.where(status: 'Accepted').order(created_at: :desc).limit(5).present? %>
+
+            <div class="list-group nearbys" style="">
+              <% Restaurant.where(status: 'Accepted').order(created_at: :desc).limit(5).each do |resto| %>
+
+              <%= link_to resto, class: 'list-group-item', style: 'margin: 5px 0 5px 0;' do %>
+                <div class="row" style="">
+                  <div class="col-md-3">
+                    <div style="background-image: url('<%= asset_path(display_resto(resto))%>'); background-size: cover; background-position: center; background-repeat: no-repeat; height: 40px; width: 40px;"></div>
+                  </div>
+                  <div class="col-md-9">
+                    <%= resto.name %><br>
+                    <small>
+                      <% (resto.ave_ratings.to_i).times do %>
+                        <%= icon('star') %>
+                      <% end %>
+                      <% unless resto.ave_ratings % 1 == 0 %>
+                        <%= icon('star-half-o')%>
+                        <% (4 - resto.ave_ratings.to_i).times do %>
+                          <%= icon('star-o') %>
+                        <% end %>
+                      <% else %>
+                        <% (5 - resto.ave_ratings.to_i).times do %>
+                          <%= icon('star-o') %>
+                        <% end %>
+                      <% end %>
+                      &nbsp;&nbsp;(<%= pluralize(resto.ratings.count, 'review') %>)
+                    </small>
+                  </div>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <%= t('.noresto')%>
+        <% end %>
+            
+      </div>
+    </div>
+    <div class="col-md-9 col-sm-12 col-xs-12" style="margin: 0; padding: 0;">
+      <div class="module" style="max-width: 750px; height: 250px; background-image: url('<%= asset_path(display_cover(@restaurant)) %>'); background-repeat: no-repeat; background-size: cover; background-position: center;">
+      </div>
+      <div style="padding: 25px; border-bottom: 2px solid whitesmoke; border-left: 2px solid whitesmoke">
+        <div class="clearfix" style="font-size: 30px; margin-bottom: 0px;">
+          <div class="pull-left">
+            <%= @restaurant.name %>
+          </div>
+          <div class="pull-right">
+            <span class="label label-danger" style="padding: 5px 10px; background-color: #CF2228;"> <%= (@restaurant.ave_ratings.round(1) % 1 == 0 ? @restaurant.ave_ratings.to_i :  @restaurant.ave_ratings.round(1) ) %> / 5</span>
+          </div>
+        </div>
+        <div class="clearfix" style="margin-top: 5px;">
+          <div class="pull-left">
+            <span style="font-size: 12px;">
+              <% list = [] %>
+              <% @restaurant.cuisine_list.each do |cuisine| %>
+                <% list << "#{link_to cuisine.name, restaurant_search_path(search: cuisine.name, searchQuery: cuisine.name), style: 'color: #888;'}" %>
+              <% end %>
+              <%= list.join(", ").html_safe %>
+            </span>
+          </div>
+          <div class="pull-right">
+            <%= pluralize(@restaurant.ratings.count, "Review") %>
+          </div>
+        </div>
+        
+        <p>
+          <%= social_share_button_tag("#{@restaurant.name}", url: "www.example.com/#{restaurant_path(@restaurant)}") %>
+        </p>
+          
+
+        <p><%= icon('map-marker', "#{@restaurant.address unless @restaurant.address.blank?}#{'Address not available' if @restaurant.address.blank?}", style: 'margin-right: 10px; color: green;') %></p>
+        <p><%= icon('phone', @restaurant.contact, style: 'margin-right: 10px; color: red;') %></p>
+        <% if @restaurant.website.present? %>
+          <p style="margin-bottom: 0;"><%= icon('globe', link_to(@restaurant.website, "#{@restaurant.website}"), style: 'margin-right: 10px; color: dodgerblue;')%></p>
+        <% else %>
+          <p style="margin-bottom: 0;"><%= icon('globe', t('.webunavailable'), style: 'margin-right: 10px; color: dodgerblue;')%></p>
+        <% end %>
+      </div>
+      <% if @restaurant.sched.present? %>
+        <div style="padding: 25px; border-bottom: 2px solid whitesmoke; border-left: 2px solid whitesmoke">
+          <h4><%= icon('clock-o', "Hours", style: 'margin-right: 8px;')%></h4>
+          <hr style="margin-top: 5px;">
+          <% @restaurant.sched.each do |day, sched| %>
+           <% sched.each do |s|%>
+            <div class="clearfix" style="padding: 0 75px;">
+             
+              <% case day %>
+              <% when 0 %>
+                <div class="pull-left">
+                  <p><%= t('.sunday')%></p>
+                </div>
+              <% when 1 %>
+                <div class="pull-left">
+                  <p><%= t('.monday')%></p>
+                </div>
+              <% when 2 %>
+                <div class="pull-left">
+                  <p><%= t('.tuesday')%></p>
+                </div>
+              <% when 3 %>
+                <div class="pull-left">
+                  <p><%= t('.wednesday')%></p>
+                </div>
+              <% when 4 %>
+                <div class="pull-left">
+                  <p><%= t('.thursday')%></p>
+                </div>
+              <% when 5 %>
+                <div class="pull-left">
+                  <p><%= t('.friday')%></p>
+                </div>
+              <% when 6 %>
+                <div class="pull-left">
+                  <p><%= t('.saturday')%></p>
+                </div>
+              <% end %>
+              <div class="pull-right">
+                  <%= s.opening %> - <%= s.closing %>
+              </div>
+            </div>
+            <%  end %>
+          <% end %>
+        </div>
+      <% end %>
+      
+      
+      <div style=" ">
+        <% if @restaurant.foods.present? %>
+          <div style="padding: 25px; border-left: 2px solid whitesmoke; border-bottom: 2px solid whitesmoke;">
+            <h4 style=" color: #676767; padding-bottom: 30px; margin: 0;"><%= icon('cutlery', t('.menu'), style: 'margin-right: 10px; font-weight: 700;') %></h4>
+            <div class="row">
+              <% unless @restaurant.foods.blank? %>
+                <% @restaurant.foods.each do |food| %>
+                  
+                  <div class="col-md-6 col-sm-6" style="margin-bottom: 10px;">
+                    <div class="clearfix" style="font-weight: bold; font-size: 15px;">
+                      <div class="pull-left">
+                        <%= food.name %>
+                      </div>
+                      <div class="pull-right">
+                        <%= number_to_currency(food.price, precision: 2, unit: "P") %>
+                      </div>
+                    </div>
+                    <div>
+                      <%= food.description %>
+                    </div>
+                  </div> 
+                <% end %>
+              <% else %>
+                <h4 style="margin-left: 13px;"><%= t('.nomenu')%></h4>
+              <% end %>
+            </div>
+          </div>
+        <% end %>
+        
+        <div style="padding: 25px; border-left: 2px solid whitesmoke; border-bottom: 2px solid whitesmoke;">
+          <div class="clearfix" style="">
+            <h4 class="pull-left" style=" color: #676767; padding-bottom: 10px; margin-top: 0px;"><%= icon('picture-o', pluralize(@restaurant.pictures.where(status: true).count,t('.photo')), style: 'margin-right: 8px;')%></h4>
+            <div class="fileUpload btn btn-danger pull-right <%= 'disabled' unless user_signed_in? %>">
+              <span><%= icon('plus', "#{'Sign in to upload' unless user_signed_in? }#{t('.addphoto') if user_signed_in? }")%></span>
+              <%= form_for(@picture) do |f| %> 
+                <% if user_signed_in? %>
+                  <%= f.file_field :pic, class: 'upload', style: 'height: 150px', accept: 'image/png,image/gif,image/jpeg'  %>
+                <% else %>
+                  <%= f.file_field :pic, class: 'upload', style: 'height: 150px', disabled: 'disabled' %>
+                <% end %>
+                <%= f.hidden_field :restaurant_id, value: @restaurant.id %>
+                <%= hidden_field_tag 'page', true %>
+              <% end %>
+            </div>
+          </div>
+
+
+          <div id="picture-part" style="padding: 0 20px 20px 20px;">
+            <%= render 'pictures/picture'%>
+          </div>
+        </div>
+        
+        <% if @restaurant.posts.present? %>
+        
+          <div style="padding: 25px; border-left: 2px solid whitesmoke; border-bottom: 2px solid whitesmoke;">
+            <h4><%= icon('rss', t('.newsannouncements'), style: 'margin-right: 8px;') %></h4>
+            <div id="announcement_area">
+              <%= render 'posts/announcement' %>
+            </div>
+          </div>
+        
+        <% end %>
+        
+
+        
+        <div style="padding: 25px; border-left: 2px solid whitesmoke;">
+          <h4 style=" color: #676767; padding-bottom: 10px;"><%= icon('star', "#{pluralize(@restaurant.ratings.count, t('.review'))}", style: 'margin-right: 8px;')%></h4>
+          
+          <div id="reviews_area">
+            <%= render 'ratings/rating'%>
+          </div>
+          
+          
+
+          <% if user_signed_in? %>
+            <% unless @restaurant.ratings.find_by(user_id: current_user.id) || @restaurant.user === current_user %>
+              <div style="margin-bottom: 20px;">
+                <button class="btn btn-danger btn-hide-click" data-toggle="collapse" data-target="#review_part" style="height: 50px; padding: 14px;"><%= t('.writereview')%></button>
+              </div>
+            <% end %>
+          <% else %>
+            <div style="margin-bottom: 20px;">
+              <button class="btn btn-danger" disabled="disabled" data-toggle="collapse" data-target="#review_part" style="height: 50px; padding: 14px;"><%= t('.signintoreview')%></button>
+            </div>
+          <% end %>
+
+
+          <div id="review_part" class="collapse" style="margin-bottom: 20px;">
+
+            <h3 style=" color: #676767; padding-bottom: 10px;"><%= icon('pencil', t('.rateresto'), style: 'margin-right: 8px;')%></h3>
+            <%= form_for(@rating) do |f| %>
+              <div class="">
+                <fieldset class="rating">
+                  <%= f.radio_button :rate, 5, id: 'star5', required: true %>
+                  <%= label_tag :star5, "", class: 'full', title: '5 Stars' %>
+                  <%= f.radio_button :rate, 4, id: 'star4', required: true  %>
+                  <%= label_tag :star4, "", class: 'full', title: '4 Stars' %>
+                  <%= f.radio_button :rate, 3, id: 'star3', required: true  %>
+                  <%= label_tag :star3, "", class: 'full', title: '3 Stars' %>
+                  <%= f.radio_button :rate, 2, id: 'star2', required: true  %>
+                  <%= label_tag :star2, "", class: 'full', title: '2 Stars' %>
+                  <%= f.radio_button :rate, 1, id: 'star1', required: true  %>
+                  <%= label_tag :star1, "", class: 'full', title: '1 Star' %>
+                </fieldset>
+              </div>
+
+              <div class="form-group">
+                <%= f.text_area :comment, class: 'form-control', rows: 7, placeholder: 'Comment' %>
+              </div>
+              <%= f.hidden_field :restaurant_id, value: @restaurant.id %>
+              <div class="actions">
+                <%= f.submit t('.addreview'), class: 'btn btn-danger' %>
+              </div>
+            <% end %>
+
+          </div>
+        </div>
+        
+      </div>
+    </div>
+  </div>
+</div>

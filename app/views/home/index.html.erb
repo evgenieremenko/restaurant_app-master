@@ -1,0 +1,15 @@
+<% if current_page?(home_path) %>
+  <%= render 'jumbotron'%>
+<% end %>
+<%= render 'restaurants' %>
+<%= render 'new_resto' %>
+<%= render 'cuisines' %>
+<%= render 'news' %>
+<%= render 'reviews' %>
+<% if user_signed_in? %>
+  <% unless current_user.restaurants.present? %>
+    <%= render 'make_a_resto' %>
+  <% end %>
+<% else %>
+  <%= render 'make_a_resto' %>
+<% end %>

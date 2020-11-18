@@ -1,0 +1,73 @@
+<div class="container" style="margin-top: 20px;">
+  <% if user_signed_in? %>
+    <div class="jumbotron center-block" style="max-width: 700px;">
+      <div class="row">
+        <div class="col-md-12">
+          <h2 class="text-center"><%= t('.enterrestoinfo')%></h2>
+        </div>
+        <div class="col-md-12">
+          <%= form_for(@restaurant, url: restaurants_path) do |f| %>
+            <div class="form-group">
+              <%= f.text_field :name, autofocus: true, class: 'form-control', placeholder: t('.restoname'), required: true %>
+            </div>
+            <div class="form-group" style="margin-top: 15px;">
+              <%= f.text_field :contact, class: 'form-control', placeholder: t('.contact'), required: true %>
+            </div>
+
+            <div class="form-group" style="margin-top: 15px;">
+              <%= f.text_field :address, class: 'form-control', placeholder: t('.address') %>
+            </div>
+            <p><%= t('.clickmap')%></p>
+            <div id="map" style="height: 400px; margin: 0px;"></div>
+            <script>
+              
+              var map;
+              var marker;
+
+              function initMap() {
+                
+                var metromanila = {lat: 14.597537989987021, lng: 120.98281860351562};
+
+                
+              
+                map = new google.maps.Map(document.getElementById('map'), {
+                  zoom: 14,
+                  center: metromanila,
+                  scrollwheel: false,
+                  clickableIcons: false
+                });
+//                map.setOptions({styles: no_poi});
+                
+                map.addListener('click', function(event) {
+                  marker.setPosition(event.latLng);
+                  console.log(marker.getPosition().lat())
+                  console.log(marker.getPosition().lng())
+                  $("#latitude").val(marker.getPosition().lat())
+                  $("#longitude").val(marker.getPosition().lng())
+                });
+                addMarker(metromanila);
+              }
+              function addMarker(location) {
+                marker = new google.maps.Marker({
+                  position: location,
+                  map: map
+                });
+              }
+            </script>
+            <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmeU6jS4Tk8t3OudUKIn7XtciDfe9CbZY&callback=initMap">
+            </script>
+            <%= hidden_field_tag :latitude %>
+            <%= hidden_field_tag :longitude %>
+            <div class="actions" style="margin-top: 20px;">
+              <%= f.submit t('.submitresto'), class: 'btn btn-danger', style: 'width: 100%;' %>
+            </div>
+          <% end %>
+        </div>
+      </div>
+    </div>
+  <% else %>
+    <%= t('.signinfirst')%> <%= link_to t('.clickhere'), new_user_session_path %>
+  <% end %>
+</div>
+
+

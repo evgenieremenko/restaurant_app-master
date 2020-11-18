@@ -1,0 +1,168 @@
+
+
+<div class="container" style="max-width: 750px;">
+  <div class="row" style="margin-top: 30px; background-color: #fff; padding: 20px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <div class="col-md-3">
+      <div class="img-responsive img-circle center-block" style="background: url('<%= asset_path(display_user(@user))%>'); width: 140px; height: 140px; border: 5px solid white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19); background-size: cover; background-position: center;">
+      </div>
+    </div>
+    <div class="col-md-9">
+      <h3><%= @user.name %> <small> @<%= @user.username %></small></h3>
+      <p><%= icon('envelope', @user.email) %></p>
+      <% if @user === current_user %>
+        <p><%= link_to "#{icon('pencil-square-o')} #{t('.editprofile')}".html_safe, edit_user_registration_path %></p>
+      <% end %>
+    </div>
+  </div>
+  
+  <div class="row" style="margin-top: 20px; background-color: #fff; padding: 20px; margin-bottom: 60px; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.1), 0 6px 20px 0 rgba(0, 0, 0, 0.19);">
+    <ul id="user-tabs" class="nav nav-tabs" role="tablist">
+      <li role="presentation" class="active"><a data-target="#fudline" aria-controls="fudline" role="tab" data-toggle="tab">Fudline</a></li>
+      <li role="presentation" class=""><a data-target="#reviewed" aria-controls="reviewed" role="tab" data-toggle="tab"><%= t('.reviewedresto')%></a></li>
+      <li role="presentation" class=""><a data-target="#photos" aria-controls="photos" role="tab" data-toggle="tab"><%= t('.uploadedphotos')%></a></li>
+    </ul>
+    
+    <div class="tab-content">
+      <div role="tabpanel" class="tab-pane fade in active" id="fudline" style="padding: 20px;">
+        <% unless @user.ratings.empty? %>
+          <div id="user_reviews_area">
+            <%= render 'users/reviews'%>
+          </div>
+        <% end %>
+        <div class="media">
+          <div class="media-left">
+            <div class="img-circle" style="width: 44px; height: 44px; background: url('<%= asset_path(display_user(@user))%>'); background-size: cover; background-position: center; "></div>
+          </div>
+          <div class="media-body">
+            <h4 class="media-heading"><%= @user.name %></h4>
+            <p><%= t('.startfudz')%></p>
+            <p><%= distance_of_time_in_words_to_now(@user.created_at) %> ago</p>
+          </div>
+        </div>
+      </div>
+      <div role="tabpanel" class="tab-pane fade in" id="reviewed" style="padding: 20px;">
+        <% if @user.ratings.present? %>
+          <div class="row">
+            <% @user.ratings.each do |rating| %>  
+              <%= link_to rating.restaurant do %>
+                <div class="module col-md-4 col-sm-6 col-xs-12 hvr-grow" style="background: linear-gradient( to bottom, rgba(0, 0, 0, 0), rgba(0, 0, 0, 0.4)), url('<%= asset_path(display_resto(rating.restaurant))  %>');background-repeat: no-repeat; background-position: center center; background-size: cover; border: 4px solid #fff; border-radius: 20px;">
+                  <header>
+                    <h3>
+                      <%= rating.restaurant.name %><br>
+                      <small style="color: #fff;">
+                        <% (rating.restaurant.ave_ratings.to_i).times do %>
+                          <%= icon('star') %>
+                        <% end %>
+                        <% unless rating.restaurant.ave_ratings % 1 == 0 %>
+                          <%= icon('star-half-o')%>
+                          <% (4 - rating.restaurant.ave_ratings.to_i).times do %>
+                            <%= icon('star-o') %>
+                          <% end %>
+                        <% else %>
+                          <% (5 - rating.restaurant.ave_ratings.to_i).times do %>
+                            <%= icon('star-o') %>
+                          <% end %>
+                        <% end %>
+                      </small>
+                    </h3>
+                  </header>
+                </div>
+              <% end %>
+            <% end %>
+          </div>
+        <% else %>
+          <p style="margin-left: -5px;"><%= t('.noreviews')%></p>
+        <% end %>
+        
+      </div>
+      <div role="tabpanel" class="tab-pane fade in" id="photos" style="padding: 20px;">
+        <div class="row pic-row" style = 'padding-left: 20px;'>
+          <% unless @user.pictures.empty? %>
+            <% @user.pictures.where(status: true).each do |picture| %>
+              <%= link_to picture_path(picture), remote: true, data: { toggle: 'modal', target: '#myModal' } do %>
+                <div class="col-md-3 col-sm-4 col-xs-6 img-responsive" style = 'background-image: url(<%= picture.pic.url %>); background-repeat: no-repeat; background-size: cover; background-position: center; border: 4px solid #fff; border-radius: 15px;'>
+                </div>
+              <% end %>
+            <% end %>
+          <% else %>
+            <p style="margin-left: -5px;"><%= t('.nophotos')%></p>
+          <% end %>
+        </div>
+      </div>
+    </div>
+    
+  </div>
+</div>
+
+    
+    
+    
+    
+    
+<div class="modal fade" id="edit_user_modal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+  <div class="modal-dialog modal-md" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+        <h4 class="modal-title"><%= t('.edituserinfo')%></h4>
+      </div>
+      <div class="modal-body">
+        <%= form_for(resource, as: resource_name, url: registration_path(resource_name), html: { method: :put }) do |f| %>
+          <%= devise_error_messages! %>
+
+          <div class="form-group">
+            <%= f.label :email, t('.email') %><br />
+            <%= f.email_field :email, autofocus: true, class: 'form-control'%>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :username, t('.username') %><br />
+            <%= f.text_field :username , class: 'form-control' %>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :name, t('.name') %><br />
+            <%= f.text_field :name , class: 'form-control' %>
+          </div>
+
+          <% if devise_mapping.confirmable? && resource.pending_reconfirmation? %>
+            <div><%= t('.pendingconfirm', email: resource.unconfirmed_email) %></div>
+          <% end %>
+
+          <div class="form-group">
+            <%= f.label :avatar, t('.avatar') %><br />
+            <%= f.file_field :avatar %>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :location, t('.location') %><br />
+            <%= f.text_field :location, class: 'form-control' %>
+          </div>
+
+          <div class="form-group">
+            <%= f.label :password, t('.password') %> <i><%= t('.passwordinfo')%></i><br />
+            <%= f.password_field :password, autocomplete: "off" %>
+          </div>
+
+          <div class="field">
+            <%= f.label :password_confirmation, t('.passwordconfirmation') %><br />
+            <%= f.password_field :password_confirmation, autocomplete: "off" %>
+          </div>
+
+          <div class="field">
+            <%= f.label :current_password, t('.currentpassword') %> <i><%= t('.currentpasswordinfo')%></i><br />
+            <%= f.password_field :current_password, autocomplete: "off" %>
+          </div>
+
+          <div class="actions">
+            <%= f.submit t('.submitupdate') %>
+          </div>
+        <% end %>
+
+        <h3><%= t('.cancel')%></h3>
+
+        <p><%= t('.unhappy')%> <%= button_to t('.cancel'), registration_path(resource_name), data: { confirm: "Are you sure?" }, method: :delete %></p>
+      </div>
+    </div>
+  </div>
+</div>

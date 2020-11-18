@@ -1,0 +1,7 @@
+<% if @err.blank? %>
+  $('#myModal').modal("hide")
+  $('#sched_area').html("<%= j render 'schedules/schedule', schedules: @schedules %>")
+<% else %>
+  $('#sched_alert_area').html("<div class='alert alert-danger'><%= @err.html_safe %></div>")
+  $('.edit_schedule .input-group').parent().addClass('has-error')
+<% end %>  

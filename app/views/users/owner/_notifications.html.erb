@@ -1,0 +1,35 @@
+<div class="clearfix" style="width: 100%; border-bottom: 1px solid #a1a1a1; margin-top: 15px; margin-bottom: 15px">
+  <h4 class="pull-left" style="color: #6b6b6b;"><%= t('.mymessages')%></h4>
+</div>
+<% unless @notifications.blank? %>
+  <div style="padding: 0 0 20px 0;">
+    <%= page_entries_info @notifications, :entry_name => 'Message' %>
+  </div>
+  
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <thead>
+        <tr style="background-color: #404040;">
+          <th><%= t('.message')%></th>
+          <th><%= t('.actions')%></th>
+        </tr>
+      </thead>
+      <tbody>
+        <% @notifications.each do |noti| %>
+          <tr>
+            <td class="notification_messages">
+              <p><%= noti.message.html_safe %></p>
+              <small style="color: #bbb"><%= noti.created_at.strftime("%B %d, %Y")%></small>
+            </td>
+            <td><%= link_to t('.delete'), delete_notification_path(noti), method: :delete, class: 'btn btn-danger' %></td>
+          </tr>
+        <% end %>
+      </tbody>
+    </table>
+  </div>
+  <div class="pull-right">
+    <%= paginate @notifications, window: 2 %>
+  </div>
+<% else %>
+  <h3><%= t('.nomessage')%></h3>
+<% end %>

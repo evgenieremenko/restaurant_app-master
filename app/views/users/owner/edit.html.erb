@@ -1,0 +1,251 @@
+<ul id="user-tabs" class="nav nav-tabs" role="tablist" style="margin-bottom: 10px;">
+  <li role="presentation" class="active"><a data-target="#edit_info" aria-controls="edit_info" role="tab" data-toggle="tab"><%= t('.editinfo')%></a></li>
+  <li role="presentation" class=""><a data-target="#announcement" aria-controls="announcement" role="tab" data-toggle="tab"><%= t('.announcementposts')%></a></li>
+  <li role="presentation" class=""><a data-target="#schedule" aria-controls="schedule" role="tab" data-toggle="tab"><%= t('.schedules')%></a></li>
+  <li role="presentation" class=""><a data-target="#dish" aria-controls="dish" role="tab" data-toggle="tab"><%= t('.dishesfoods')%></a></li>
+  <li role="presentation" class=""><a data-target="#review" aria-controls="review" role="tab" data-toggle="tab"><%= t('.reviews')%></a></li>
+  <li role="presentation" class=""><a data-target="#photo" aria-controls="photo" role="tab" data-toggle="tab"><%= t('.photos')%></a></li>
+  <li role="presentation" class=""><a data-target="#unhappy" aria-controls="unhappy" role="tab" data-toggle="tab"><%= t('.unhappy')%></a></li>
+</ul>
+
+<div class="tab-content">
+  <div role="tabpanel" class="tab-pane fade in active" id="edit_info">
+    <div id="coverphoto" style="width: 100%; background-size: 100%; padding-top: 20px; margin-bottom: 50px; background-repeat: no-repeat; height: 500px;background-position: center; background-image: url('<%= asset_path(display_cover(@restaurant)) %>')">
+      <%= image_tag(display_resto(@restaurant), class: 'img-responsive img-circle center-block', style: 'width: 225px; height: 225px; border: 5px solid white; box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);')%>
+
+      <div class="center-block" style="max-width: 300px; background-color: rgba(0,0,0,0.5); color: #fff; padding: 0px 20px 30px 20px; border-radius: 25px; border: 2px solid black; margin-top: 25px;">
+        <h2 style="padding-top: 15px;" class="text-center"><%= @restaurant.name %></h2>
+      </div>
+    </div>
+
+    <div style="width: 100%;">
+      <h4 style="color: #6b6b6b; border-bottom: 1px solid #a1a1a1; padding-bottom: 15px;"><%= t('.editinfo')%></h4>
+    </div>
+    <div style="margin-bottom: 50px;">
+      <%= form_for(@restaurant, url: restaurant_path, method: :put) do |f| %>
+        <% if @restaurant.errors.any? %>
+          <div id="error_explanation">
+            <h2><%= pluralize(@restaurant.errors.count, "error") %><%= t('.prohibitsave')%></h2>
+            <ul>
+              <% @restaurant.errors.full_messages.each do |msg| %>
+              <li><%= msg %></li>
+            <% end %>
+            </ul>
+          </div>
+        <% end %>
+        <div class="row">
+          <div class="col-md-6">
+            <div class="form-group">
+              <%= f.label :name, t('.name') %>
+              <%= f.text_field :name, class: 'form-control' %>
+            </div>
+            <div class="form-group">
+              <%= f.label t('.contact') %>
+              <%= f.text_field :contact, class: 'form-control' %>
+            </div>
+            <div class="form-group">
+              <%= f.label t('.restopic') %>
+              <%= f.file_field :avatar, accept: 'image/png,image/gif,image/jpeg'  %>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="form-group">
+              <%= f.label :address, t('.address') %>
+              <%= f.text_area :address, class: 'form-control' %>
+            </div>
+            <div class="form-group">
+              <%= f.label :website, t('.website')%>
+              <%= f.url_field :website, class: 'form-control'%>
+            </div>
+            <div class="form-group">
+              <%= f.label t('.cover') %>
+              <%= f.file_field :cover, accept: 'image/png,image/gif,image/jpeg' %>
+            </div>
+          </div>
+          <div class="col-md-12">
+            <h4><%= @restaurant.location.present? ? t('.editmaplocation') : t('.setuplocation').html_safe %></h4>
+            <div id="map" style="height: 250px; margin-bottom: 10px;"></div>
+            <script>
+
+              var map;
+              var marker;
+
+              function initMap() {
+                var init_location = {lat: <%= (@restaurant.location.present? ? @restaurant.location.latitude : "14.598451648903144") %>, lng: <%= (@restaurant.location.present? ? @restaurant.location.longitude : "120.98510786890984" ) %>};
+
+                
+                map = new google.maps.Map(document.getElementById('map'), {
+                  zoom: 14,
+                  center: init_location,
+                  scrollwheel: false,
+                  clickableIcons: false
+                });
+                
+                map.addListener('click', function(event) {
+                  marker.setPosition(event.latLng);
+                  console.log(marker.getPosition().lat())
+                  console.log(marker.getPosition().lng())
+                  $("#latitude").val(marker.getPosition().lat())
+                  $("#longitude").val(marker.getPosition().lng())
+                });
+                addMarker(init_location);
+              }
+              function addMarker(location) {
+                marker = new google.maps.Marker({
+                  position: location,
+                  map: map
+                });
+              }
+            </script>
+            <script async defer src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAmeU6jS4Tk8t3OudUKIn7XtciDfe9CbZY&callback=initMap">
+            </script>
+          </div>
+          <%= hidden_field_tag :latitude, (@restaurant.location.present? ? @restaurant.location.latitude : nil) %>
+          <%= hidden_field_tag :longitude, (@restaurant.location.present? ? @restaurant.location.longitude : nil) %>
+          <div class="col-md-12">
+            <%= f.submit t('.updateresto'), class: 'btn btn-primary center-block outline' %>
+          </div>
+        </div>
+
+      <% end %>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane fade in" id="announcement">
+    <div class="clearfix" style="width: 100%; border-bottom: 1px solid #a1a1a1; margin-top: 15px; margin-bottom: 15px">
+      <h4 class="pull-left" style="color: #6b6b6b;"><%= t('.announcementposts')%></h4>
+      <%= link_to "#{icon('plus', t('.addposts'), style: 'margin-right: 10px;')}".html_safe, new_post_path(resto_id: @restaurant.id), class: 'btn btn-default pull-right', remote: true, data: { toggle: 'modal', target: '#myModal'} %>
+    </div>
+
+    <div id="post_area">
+      <%= render 'posts/post'%>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane fade in" id="schedule">
+    <div class="clearfix" style="width: 100%; border-bottom: 1px solid #a1a1a1; margin-top: 15px; margin-bottom: 15px">
+      <h4 class="pull-left" style="color: #6b6b6b;"><%= t('.schedules')%></h4>
+      <%= link_to "#{icon('plus', t('.addschedules'), style: 'margin-right: 10px;')}".html_safe, new_schedule_path(resto_id: @restaurant.id), class: 'time btn btn-default pull-right', remote: true, data: { toggle: 'modal', target: '#myModal'} %>
+    </div>
+
+    <div id="sched_area">
+      <%= render 'schedules/schedule' %>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane fade in" id="dish">
+    <div class="clearfix" style="width: 100%; border-bottom: 1px solid #a1a1a1; margin-top: 15px; margin-bottom: 15px">
+      <h4 class="pull-left" style="color: #6b6b6b;"><%= t('.dishes')%></h4>
+      <%= link_to "#{icon('plus', t('.adddish'), style: 'margin-right: 10px;')}".html_safe, new_food_path(resto_id: @restaurant.id), class: 'btn btn-default pull-right', remote: true, data: { toggle: 'modal', target: '#myModal'} %>
+    </div>
+
+    <div id="food_area">
+      <%= render 'foods/food' %>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane fade in" id="review">
+    <div style="width: 100%;">
+      <h4 style="color: #6b6b6b; border-bottom: 1px solid #a1a1a1; padding-bottom: 15px;"><%= t('.reviews')%></h4>
+    </div>
+    <div>
+      <% unless @ratings.empty? %>
+        <div class="table-responsive">
+          <table class="table table-bordered"> 
+            <thead>
+              <tr style="background-color: #404040;">
+                <th>#</th>
+                <th style="width: 85px;"><%= t('.name')%></th>
+                <th><%= t('.rate')%></th>
+                <th><%= t('.comment')%></th>
+                <th style="width: 100px;"><%= t('.date')%></th>
+              </tr>
+            </thead>
+            <tbody>
+              <% @ratings.each_with_index do |rate, index| %>
+                <tr>
+                  <td><%= index+1 %></td>
+                  <td><%= link_to rate.user.name, user_path(rate.user) %></td>
+                  <td><%= rate.rate %></td>
+                  <td><%= rate.comment %></td>
+                  <td><%= rate.created_at.strftime("%B %d, %Y") %></td>
+                </tr>
+              <% end %>
+            </tbody>
+          </table>
+        </div>
+      <% else %>
+        <%= t('.noratings')%>
+      <% end %>
+    </div>
+  </div>
+  <div role="tabpanel" class="tab-pane fade in" id="photo"> 
+    <div style="width: 100%;" id="photo_area">
+      <%= render 'pictures/photo_area' %>
+    </div>
+    
+    <div style="width: 100%;">
+      <h4 style="color: #6b6b6b; border-bottom: 1px solid #a1a1a1; padding-bottom: 15px;"><%= t('.pendingphotos')%></h4>
+    </div>
+
+    <% unless @restaurant.pictures.where(status: false).empty? %>
+      <div class="row thumbnail_panel pending_pic">
+        <% @restaurant.pictures.where(status: false).each do |picture| %>
+          <div class="col-md-4">
+            <div class="thumbnail text-center" style=" padding: 0px; border: 0; border-radius: 0px;">
+              <%= image_tag(picture.pic.url, style: 'height: 220px; padding: 0px;', class: 'img-responsive') %>
+              <div class="caption">
+                <div class="row">
+                  <div class="col-md-6">
+                    <p><%= t('.uploader')%></p>
+                    <p><%= t('.uploaddate')%></p>
+                  </div>
+                  <div class="col-md-6">
+                    <p><%= picture.user.username %></p>
+                    <p><%= picture.created_at.strftime("%B %d, %Y") %></p>
+                  </div>
+                </div>
+              </div>
+              <div class="panel-footer" style="background-color: #fff; border-radius: 0px;">
+                <div class="row">
+                  <div class="col-md-6">
+                    <%= button_to t('.accept'), picture_path(picture.id, picture: { status: true }), class: 'btn btn-success', style: 'width: 100%;', method: :put%>
+                  </div>
+                  <div class="col-md-6">
+                    <%= button_to t('.reject'), picture_path(picture), class: 'btn btn-danger', style: 'width: 100%;', method: :delete%>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        <% end %>
+      </div>
+    <% else %>
+      <%= t('.pendingpictures')%>
+    <% end %>
+  </div>
+  <div role="tabpanel" class="tab-pane fade in" id="unhappy">
+    <div style="width: 100%;">
+      <h4 style="color: #6b6b6b; border-bottom: 1px solid #a1a1a1; padding-bottom: 15px;"><%= t('.nothappy')%></h4>
+      <%= button_to t('.deleteresto'), restaurant_path(@restaurant), method: :delete, class: 'btn btn-danger', data: { confirm: t('.deleteconfirm') }%>
+    </div>
+  </div>  
+</div>
+
+<script>
+    $('#user-tabs a').click(function (e) {
+        e.preventDefault()
+        $(this).tab('show')
+    });
+
+    // store the currently selected tab in the hash value
+    $("ul.nav-tabs > li > a").on("shown.bs.tab", function (e) {
+        var id = $(e.target).attr("data-target").substr(1);
+        window.location.hash = id;
+    });
+
+    // on load of the page: switch to the currently selected tab
+    var hash = window.location.hash;
+    $('#user-tabs a[data-target="' + hash + '"]').tab('show');
+</script>
+
+
+
+
+  

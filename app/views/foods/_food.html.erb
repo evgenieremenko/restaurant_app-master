@@ -1,0 +1,30 @@
+
+
+<% unless @foods.empty? %>
+    <div class="table-responsive">
+      <table class="table table-bordered">
+        <thead>
+          <tr style="background-color: #404040;">
+            <th><%= t('.dish')%></th>
+            <th><%= t('.description')%></th>
+            <th><%= t('.cuisine')%></th>
+            <th style="width: 80px;"><%= t('.price')%></th>
+            <th><%= t('.actions')%></th>
+          </tr>
+        </thead>
+        <tbody>
+          <% @foods.each do |food| %>
+            <tr>
+              <td><%= food.name %></td>
+              <td><%= food.description %></td>
+              <td><%= food.cuisine.name %></td>
+              <td><%= number_to_currency(food.price, unit: "P") %></td>
+              <td style="width: 150px;"><%= link_to t('.edit'), edit_food_path(food.id), class: 'btn btn-primary outline', remote: true,  data: { toggle: 'modal', target: '#myModal'} %> <%= link_to t('.delete'), food_path(food.id), class: 'btn btn-danger', method: :delete, data: { confirm: t('.confirm') }, remote: true %></td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
+    </div>
+<% else %>
+  <%= t('.empty') %>
+  <% end %>
